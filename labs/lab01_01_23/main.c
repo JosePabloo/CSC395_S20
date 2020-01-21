@@ -65,15 +65,15 @@ int main() {
     for (i=0; i<3; i++) {
         // Green ON
         PORTD &= ~( 1 << PORTD5 );
-        PORTC &= ~( 1 << PORTC7 );
+        PORTC |= ( 1 << PORTC7 );
         _delay_ms(2500);
 
         // Yellow and Green OFF
         PORTD |= ( 1 << PORTD5 );
-        PORTC |= ( 1 << PORTC7 );
+        PORTC &= ~( 1 << PORTC7 );
         _delay_ms(2500);
     }
-  
+
 
     while(1) {
         // If button A is pressed, green led is on.
@@ -85,10 +85,11 @@ int main() {
 
 
         // If button C is pressed, yellow led is on.
+        //First IF statement is 
         if (0 == (PINB & (1 << 0))) {
-            PORTC ^= (1 << PORTC7);
+            PORTC |= ( 1 << PORTC7 );
         } else {
-            PORTC |= (1 << PORTC7);
+            PORTC &= ~( 1 << PORTC7 );
         }
 
 
