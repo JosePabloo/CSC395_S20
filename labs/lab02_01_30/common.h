@@ -43,22 +43,6 @@ typedef  struct {
 };IO_struct;
 
 
-/*
- * turn on specified on board LED. indicate if inverted (0 turns led on)
- */
-void led_on(IO_struct * color, int inverted);
-
-/*
- * turn off specified on board LED. indicate if inverted (1 turns led off)
- */
-void led_off(IO_struct * color, int inverted);
-
-/*
- * toggle the led between on and off
- */
-void led_toggle(IO_struct * color);
-
-
 
 
 
