@@ -36,6 +36,14 @@ void initialize_led(int color) {
 
 void led_on(IO_struct * color, int inverted) {
   // define this. (look at flash_led for inspiration)
+  //Checking to see if the int is inverted.
+  if(!inverted){
+      SET_BIT(*color->port, color->pin); //we're using the stuff from commom.h to set the single bit.
+  } else{
+      CLEAR_BIT(*color->port, color->pin);
+  }
+
+  TOGGLE_BIT(*color->port, color->pin);
 }
 
 void led_off(IO_struct * color, int inverted) {
