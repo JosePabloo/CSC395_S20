@@ -1,5 +1,5 @@
-#ifndef COMMON_H
-#define COMMOM_H
+#ifndef COMMON_H_
+#define COMMOM_H_
 
 #ifndef F_CPU
 #define F_CPU
@@ -31,7 +31,7 @@
 
 //Definding a user-defined type called IO_struct which
 //contains 5 cariables.
-// & is used to the the address of a variable. 
+// & is used to the the address of a variable.
 // * is a type of specifier in a variable declaration.
 typedef  struct {
     volatile uint8_t * ddr;
