@@ -85,7 +85,7 @@ int main() {
 
 
         // If button C is pressed, yellow led is on.
-        //First IF statement is 
+        //First IF statement is
         if (0 == (PINB & (1 << 0))) {
             PORTC |= ( 1 << PORTC7 );
         } else {
