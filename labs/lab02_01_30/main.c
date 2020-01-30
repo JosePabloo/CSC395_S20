@@ -51,17 +51,78 @@ int main(void) {
 	// Assume both buttons start in a not pressed state.
 
 	uint8_t green_on = 1;
+    uint8_t green_off = 1;
 
   while(1) {
 
-		_delay_ms(1000);
-		led_toggle(&_yellow);
-		if (green_on) {
-			led_toggle(&_green);
-		} else {
-			led_off(&_green,INVERTED);
-		}
 
-	} // end while(1)
+      _delay_ms(1000);
+      green_on = is_button_pressed(&_buttonA);
+      green_off = is_button_pressed(&_buttonC);
+      led_on(&_yellow,INVERTED);
+      green_on = is_button_pressed(&_buttonA);
+      green_off = is_button_pressed(&_buttonC);
+      _delay_ms(1000);
+      green_on = is_button_pressed(&_buttonA);
+      green_off = is_button_pressed(&_buttonC);
+      led_off(&_yellow,0);
+      green_on = is_button_pressed(&_buttonA);
+      green_off = is_button_pressed(&_buttonC);
+
+      if (green_on) {
+          while(green_on){
+              led_on(&_green,0);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_off(&_green,1);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_on(&_green,0);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_off(&_green,1);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_on(&_yellow,INVERTED);
+              green_off = is_button_pressed(&_buttonC);
+              led_on(&_green,0);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_off(&_green,1);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_on(&_green,0);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_off(&_green,1);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+              green_off = is_button_pressed(&_buttonC);
+              led_on(&_green,0);
+              green_off = is_button_pressed(&_buttonC);
+              led_off(&_yellow,0);
+              green_off = is_button_pressed(&_buttonC);
+              _delay_ms(250);
+          }
+          if (green_off){
+              green_on = 1;
+              green_off = 1;
+          }
+
+      }
+
+
+
+
+
+
+  } // end while(1)
 
 } /* end main() */

@@ -47,11 +47,21 @@ void led_on(IO_struct * color, int inverted) {
 }
 
 void led_off(IO_struct * color, int inverted) {
-  // define this.
+    if(!inverted){
+        CLEAR_BIT(*color->port, color->pin);
+    } else{
+        SET_BIT(*color->port, color->pin);
+    }
 }
 
 void led_toggle(IO_struct * color) {
-  // define this
+    CLEAR_BIT(*color->port, color->pin);
+    SET_BIT(*color->port, color->pin);
+
+
+    TOGGLE_BIT(*color->port, color->pin);
+
+
 }
 
 /* Flash the designated on-board led for 250ms on, then 250ms off.
@@ -63,8 +73,8 @@ void flash_led(IO_struct * color, int inverted) {
     CLEAR_BIT(*color->port, color->pin);
   }
   _delay_ms(250);
-  TOGGLE_BIT(*color->port, color->pin);
-  _delay_ms(250);
+    TOGGLE_BIT(*color->port, color->pin);
+    _delay_ms(250);
 }
 
 /* Flash all the initialized leds for a sanity check light show */

@@ -1,11 +1,11 @@
 #ifndef LEDS_H_
-
+#define  LEDS_H_
 #include "common.h"
 #include <util/delay.h>
 #include <inttypes.h>
 
 
-#defind GREEN 5
+#define GREEN 5
 #define YELLOW 7
 #define RED 0
 
