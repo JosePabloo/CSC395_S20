@@ -55,7 +55,7 @@ void led_off(IO_struct * color, int inverted) {
 }
 
 void led_toggle(IO_struct * color) {
-    _delay_ms(250);
+    //_delay_ms(250);
     TOGGLE_BIT(*color->port, color->pin);
 }
 
