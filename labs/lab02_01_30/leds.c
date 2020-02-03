@@ -55,13 +55,8 @@ void led_off(IO_struct * color, int inverted) {
 }
 
 void led_toggle(IO_struct * color) {
-    CLEAR_BIT(*color->port, color->pin);
-    SET_BIT(*color->port, color->pin);
-
-
+    //_delay_ms(250);
     TOGGLE_BIT(*color->port, color->pin);
-
-
 }
 
 /* Flash the designated on-board led for 250ms on, then 250ms off.
