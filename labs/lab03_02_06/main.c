@@ -8,9 +8,14 @@
 
 #define INVERTED 1
 
+enum buttonA_states { A_Starting, A_FirstPress, A_SecondPress, A_ThirdPress } ButtonA_State;
+
 /****************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
+
+
+
 void initialize_system(void) {
     // initalize green and yellow only.
     // initialization defines the IO_structs and sets DDR
@@ -25,15 +30,78 @@ void initialize_system(void) {
     // NOTE: button C and the RED led are on the same line.
     initialize_button(BUTTONA);
     initialize_button(BUTTONC);
+
+    enable_pcint(&_interruptA);
+    enable_pcint(&_interruptC);
+
+
+    // Setting up the button action. when its pressed or released.
+    // When it's released, called the release funciton.
+    // when released call release function
+
+//    setup_button_action(&_interruptA, PRESS);
+//    setup_button_action(&_interruptC, PRESS);
+
+    setup_button_action(&_interruptA, 1, buttonAPressed);
+    setup_button_action(&_interruptC,1,toggleGreen);
 }
+
+void buttonAPressed()
+{
+    switch(ButtonA_State) {   // Transitions
+        case LA_SMStart:  // Initial transition
+            LA_State = LA_s0;
+            break;
+
+        case LA_s0:
+            if (!A0) {
+                LA_State = LA_s0;
+            }
+            else if (A0) {
+                LA_State = LA_s1;
+            }
+            break;
+
+        case LA_s1:
+            if (!A0) {
+                LA_State = LA_s0;
+            }
+            else if (A0) {
+                LA_State = LA_s1;
+            }
+            break;
+
+        default:
+            Button_A_State = LA_SMStart;
+            break;
+    } // Transitions
+
+    switch(ButtonA_State) {   // State actions
+        case LA_s0:
+            break;
+
+        case LA_s1:
+            B0 = A1;
+            break;
+
+        default:
+            break;
+    } // State actions
+}
+
+
+
+
 
 /****************************************************************************
    MAIN
 ****************************************************************************/
 
+
 int main(void) {
     // This prevents the need to reset after flashing
     USBCON = 0;
+    LA_State = LA_SMStart; // Indicates initial call
 
     initialize_system();
 
@@ -43,65 +111,29 @@ int main(void) {
 
     // FILL THIS IN TO MEET FUNCTIONAL REQUIREMENTS:
 
-    // Always toggle yellow LED every 1000ms
-    // Toggle greed LED every 500ms, but only if is in an on state
-    // Press and release button A switches green to on state.
-    // Press and release button C switches green to off state.
+   // Start with the system with both LED's off.
+   // BUTTON A: modifies only rhe Yellow LED state.
+   // BUTTON C: modifies only the Green LED state.
 
-    // Assume both buttons start in a not pressed state.
+   // 1st release: LED ON (solidly, no blinking).
+   // 2nd release: LED Blink at frequency provided below
+   // 3rd release: LED OFF
 
-    uint8_t green_on = 1;
+   // When an LED is Blinking:
+   // YELLOW LED - YELLOW LED blink at .4 Hz (ON at 1250 ms, OFF at 2500 ms)
+   // GREEN LED - blink at 2 Hz (ON at 250 ms, OFF at 500 ms, ON at 750 ms, OFF at 1 sec)
+
+   // ONLY USE THE PCINT ISR
+    //Assiming that both buttons are in a not pressed state.
+
+    //Set up the counter and the states for both Buttons
+
+    sei();  //calling this from main.
+
+
 
     while (1) {
-
-        /*
-         * this first while loop is toggling the yellow LED every 1000ms looking for a state change
-         * in between every delay.
-         * If button A is pressed, the State is changed for green_on.
-         * Then it goes into the second while look.
-         */
-
-
-        _delay_ms(1000);
-        green_on = is_button_pressed(&_buttonA);
-
-        led_on(&_yellow, INVERTED);
-        green_on = is_button_pressed(&_buttonA);
-
-        _delay_ms(1000);
-        green_on = is_button_pressed(&_buttonA);
-
-        led_off(&_yellow, 0);
-        green_on = is_button_pressed(&_buttonA);
-
-        while (green_on) {
-/*
- * This is the second while loop. One is in here and is toggling the green LED on, then checking for the state.
- * After it checks for the state, its delaying 500ms. After 1000ms, it toggles the yellow LED.
- * If the state is changed, then it gets kicked out of this while loop back to the first one.
- */
-            led_toggle(&_green);
-            green_on = !is_button_pressed(&_buttonC);
-            _delay_ms(500);
-
-            led_toggle(&_green);
-            green_on = !is_button_pressed(&_buttonC);
-            _delay_ms(500);
-
-            led_toggle(&_green);
-            led_on(&_yellow, INVERTED);
-            green_on = !is_button_pressed(&_buttonC);
-            _delay_ms(500);
-
-            led_toggle(&_green);
-            green_on = !is_button_pressed(&_buttonC);
-            _delay_ms(500);
-
-            led_off(&_yellow, 0);
-
-        }//End of while(green_on)
-
-
+        TickFct_Latch();
 
 
 
