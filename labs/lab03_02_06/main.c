@@ -23,6 +23,7 @@ uint8_t greenTimer = 0;
 uint32_t mainTimer = 0;
 volatile uint8_t button_a_pressed_counter = 0;
 volatile uint8_t button_c_pressed_counter = 0;
+
 /***************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
@@ -66,27 +67,25 @@ void Yellow_LED_Cases() {
         //If the Button A is pressed, Move the Flag counter to the first relase.
         case A_Starting:
             led_off(&_yellow, 0);
-           if(1 == button_a_pressed_counter){
-               ButtonA_State = A_FirstPress;
-               led_on(&_green,INVERTED);
-           }
+            if (1 == button_a_pressed_counter) {
+                ButtonA_State = A_FirstPress;
+            }
             break;
-           //First press is the second  case is turning on the LED.
+            //First press is the second  case is turning on the LED.
         case A_FirstPress:
-            led_on(&_yellow,INVERTED);
-
-            if(2 == button_a_pressed_counter){
+            led_on(&_yellow, INVERTED);
+            if (2 == button_a_pressed_counter) {
                 ButtonA_State = A_SecondPress;
             }
             break;
             // Second Press is flashing at .4 hz
         case A_SecondPress:
-          if(yellowTimer % 1250 == 0){
-              led_toggle(&_yellow);
-          }
-          if(3 == button_a_pressed_counter){
-              ButtonA_State = A_Starting;
-          }
+            if (yellowTimer % 1250 == 0) {
+                led_toggle(&_yellow);
+            }
+            if (3 == button_a_pressed_counter) {
+                ButtonA_State = A_Starting;
+            }
             break;
         default:
             ButtonA_State = A_Starting;
@@ -94,7 +93,44 @@ void Yellow_LED_Cases() {
     } // Transitions
 
 
-    } // State actions
+} // State actions
+
+
+
+void Green_LED_Cases() {
+    switch (ButtonC_State) {   // Transitions
+        // Initial transition
+        //Stating off with the LED off.
+        //If the Button A is pressed, Move the Flag counter to the first relase.
+        case C_Starting:
+            led_off(&_green,1);
+            if (1 == button_c_pressed_counter) {
+                ButtonC_State = C_FirstPress;
+            }
+            break;
+            //First press is the second  case is turning on the LED.
+        case C_FirstPress:
+            led_on(&_green, 0);
+            if (2 == button_c_pressed_counter) {
+                ButtonC_State = C_SecondPress;
+            }
+            break;
+            // Second Press is flashing at .4 hz
+        case C_SecondPress:
+            if (greenTimer % 250 == 0) {
+                led_toggle(&_green);
+            }
+            if (3 == button_c_pressed_counter) {
+                ButtonC_State = C_Starting;
+            }
+            break;
+        default:
+            ButtonC_State = C_Starting;
+            break;
+    } // Transitions
+
+
+} // State actions
 
 
 
@@ -137,11 +173,15 @@ int main(void) {
     button_a_pressed_counter = 0;
     ButtonA_State = A_Starting;
 
+    button_c_pressed_counter = 0;
+    ButtonC_State = C_Starting;
+
 
     sei();  //calling this from main.
 
     while (1) {
         Yellow_LED_Cases();
+        Green_LED_Cases();
         _delay_ms(250);
         mainTimer += 250;
     } // end while(1)

@@ -130,4 +130,8 @@ void button_a_pressed(){
 
 void button_c_pressed(){
     button_c_pressed_counter =  button_c_pressed_counter + 1;
+    if(button_c_pressed_counter == 4){
+        button_c_pressed_counter = 1;
+
+    }
 }
