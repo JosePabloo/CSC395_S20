@@ -7,13 +7,25 @@
 #include "buttons.h"
 
 #define INVERTED 1
+#define ZERO 0
 
-enum buttonA_states { A_Starting, A_FirstPress, A_SecondPress, A_ThirdPress } ButtonA_State;
 
-/****************************************************************************
+enum buttonA_states {
+    A_Starting, A_FirstPress, A_SecondPress, A_ThirdPress
+} ButtonA_State;
+enum buttonC_states {
+    C_Starting, C_FirstPress, C_SecondPress, C_ThirdPress
+} ButtonC_State;
+
+//Adding the timers for the different states.
+uint8_t yellowTimer = 0;
+uint8_t greenTimer = 0;
+uint32_t mainTimer = 0;
+volatile uint8_t button_a_pressed_counter = 0;
+volatile uint8_t button_c_pressed_counter = 0;
+/***************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
-
 
 
 void initialize_system(void) {
@@ -28,8 +40,8 @@ void initialize_system(void) {
 
     // initalize only buttonA and buttonC because they are connected to PCINT
     // NOTE: button C and the RED led are on the same line.
-    initialize_button(BUTTONA);
-    initialize_button(BUTTONC);
+    initialize_button(&_buttonA);
+    initialize_button(&_buttonC);
 
     enable_pcint(&_interruptA);
     enable_pcint(&_interruptC);
@@ -39,57 +51,50 @@ void initialize_system(void) {
     // When it's released, called the release funciton.
     // when released call release function
 
-//    setup_button_action(&_interruptA, PRESS);
-//    setup_button_action(&_interruptC, PRESS);
+//    setup_button_action(&_interruptA, 0);
+//    setup_button_action(&_interruptC, 0);
 
-    setup_button_action(&_interruptA, 1, buttonAPressed);
-    setup_button_action(&_interruptC,1,toggleGreen);
+    setup_button_action(&_interruptA, 1, button_a_pressed);
+    setup_button_action(&_interruptC, 1, button_c_pressed);
 }
 
-void buttonAPressed()
-{
-    switch(ButtonA_State) {   // Transitions
-        case LA_SMStart:  // Initial transition
-            LA_State = LA_s0;
+//This is going to hold the state of the Yellow LED.=
+void Yellow_LED_Cases() {
+    switch (ButtonA_State) {   // Transitions
+        // Initial transition
+        //Stating off with the LED off.
+        //If the Button A is pressed, Move the Flag counter to the first relase.
+        case A_Starting:
+            led_off(&_yellow, 0);
+           if(1 == button_a_pressed_counter){
+               ButtonA_State = A_FirstPress;
+               led_on(&_green,INVERTED);
+           }
             break;
+           //First press is the second  case is turning on the LED.
+        case A_FirstPress:
+            led_on(&_yellow,INVERTED);
 
-        case LA_s0:
-            if (!A0) {
-                LA_State = LA_s0;
-            }
-            else if (A0) {
-                LA_State = LA_s1;
-            }
-            break;
-
-        case LA_s1:
-            if (!A0) {
-                LA_State = LA_s0;
-            }
-            else if (A0) {
-                LA_State = LA_s1;
+            if(2 == button_a_pressed_counter){
+                ButtonA_State = A_SecondPress;
             }
             break;
-
+            // Second Press is flashing at .4 hz
+        case A_SecondPress:
+          if(yellowTimer % 1250 == 0){
+              led_toggle(&_yellow);
+          }
+          if(3 == button_a_pressed_counter){
+              ButtonA_State = A_Starting;
+          }
+            break;
         default:
-            Button_A_State = LA_SMStart;
+            ButtonA_State = A_Starting;
             break;
     } // Transitions
 
-    switch(ButtonA_State) {   // State actions
-        case LA_s0:
-            break;
 
-        case LA_s1:
-            B0 = A1;
-            break;
-
-        default:
-            break;
     } // State actions
-}
-
-
 
 
 
@@ -101,7 +106,7 @@ void buttonAPressed()
 int main(void) {
     // This prevents the need to reset after flashing
     USBCON = 0;
-    LA_State = LA_SMStart; // Indicates initial call
+
 
     initialize_system();
 
@@ -111,33 +116,34 @@ int main(void) {
 
     // FILL THIS IN TO MEET FUNCTIONAL REQUIREMENTS:
 
-   // Start with the system with both LED's off.
-   // BUTTON A: modifies only rhe Yellow LED state.
-   // BUTTON C: modifies only the Green LED state.
+    // Start with the system with both LED's off.
+    // BUTTON A: modifies only rhe Yellow LED state.
+    // BUTTON C: modifies only the Green LED state.
 
-   // 1st release: LED ON (solidly, no blinking).
-   // 2nd release: LED Blink at frequency provided below
-   // 3rd release: LED OFF
+    // 1st release: LED ON (solidly, no blinking).
+    // 2nd release: LED Blink at frequency provided below
+    // 3rd release: LED OFF
 
-   // When an LED is Blinking:
-   // YELLOW LED - YELLOW LED blink at .4 Hz (ON at 1250 ms, OFF at 2500 ms)
-   // GREEN LED - blink at 2 Hz (ON at 250 ms, OFF at 500 ms, ON at 750 ms, OFF at 1 sec)
+    // When an LED is Blinking:
+    // YELLOW LED - YELLOW LED blink at .4 Hz (ON at 1250 ms, OFF at 2500 ms)
+    // GREEN LED - blink at 2 Hz (ON at 250 ms, OFF at 500 ms, ON at 750 ms, OFF at 1 sec)
 
-   // ONLY USE THE PCINT ISR
+    // ONLY USE THE PCINT ISR
     //Assiming that both buttons are in a not pressed state.
 
     //Set up the counter and the states for both Buttons
+    //Need to initialize the counter flags for both buttons.
+    //Ned to initalize the states for both LED's
+    button_a_pressed_counter = 0;
+    ButtonA_State = A_Starting;
+
 
     sei();  //calling this from main.
 
-
-
     while (1) {
-        TickFct_Latch();
-
-
-
-
+        Yellow_LED_Cases();
+        _delay_ms(250);
+        mainTimer += 250;
     } // end while(1)
 
 } /* end main() */

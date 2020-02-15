@@ -5,6 +5,8 @@
 //#define DEBUG
 
 uint8_t button_mask = 0;
+extern volatile uint8_t button_a_pressed_counter;
+extern volatile uint8_t button_c_pressed_counter;
 
 IO_struct _buttonA = { &DDRB, &PORTB, BUTTONA, &PINB };
 IO_struct _buttonC = { &DDRB, &PORTB, BUTTONC, &PINB };
@@ -49,15 +51,6 @@ void setup_button_action(
     }
 }
 
-//This is a function that is keeping track of the number of
-//times that the button A and Button Chas been pressed.
-void button_a_pressed_counter(){
-    button_a_pressed_counter = button_a_pressed_counter + 1;
-}
-
-void button_c_pressed_counter(){
-    button_c_pressed_counter = button_c_pressed_counter + 1;
-}
 
 ISR(PCINT0_vect) {
 
@@ -124,4 +117,17 @@ ISR(PCINT0_vect) {
                 _interruptC.prev_state = state;
             }
         }
+}
+
+//This is a function that is keeping track of the number of
+//times that the button A and Button Chas been pressed.
+void button_a_pressed(){
+    button_a_pressed_counter = button_a_pressed_counter + 1;
+    if(button_a_pressed_counter == 4){
+        button_a_pressed_counter = 1;
+    }
+}
+
+void button_c_pressed(){
+    button_c_pressed_counter =  button_c_pressed_counter + 1;
 }
