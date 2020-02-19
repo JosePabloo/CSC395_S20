@@ -38,7 +38,7 @@ void initialize_system(void) {
     // The "sanity check".
     // When you see this pattern of lights you know the board has reset
     light_show();
-
+    external_light_show();
     // initalize only buttonA and buttonC because they are connected to PCINT
     // NOTE: button C and the RED led are on the same line.
     initialize_button(&_buttonA);
