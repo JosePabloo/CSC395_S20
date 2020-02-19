@@ -35,24 +35,24 @@ void initialize_led(int color) {
     configure_led(&_red);
     bRedInit = 1;
     break;
+
     //BreadBoard Cases:
+      case (YELLOWBREADBOARD) :
+          _yellowbb = (IO_struct) { &DDRC, &PORTC, YELLOWBREADBOARD, &PINC };
+          configure_led(&_yellow);
+          bYellowInitBreadBoard = 1;
+          break;
 
       case(GREENBREADBOARD):
-          _red = (IO_struct) { &DDRB, &PORTB, RED, &PINB };
-          configure_led(&_red);
-          bRedInit = 1;
+          _greenbb = (IO_struct) { &DDRD, &PORTD, GREENBREADBOARD, &PIND };
+          configure_led(&_green);
+          bGreenInitBreadBoard = 1;
           break;
 
-      case(YELLOWBREADBOARD):
-          _red = (IO_struct) { &DDRB, &PORTB, RED, &PINB };
+      case(REDBREADBOARD):
+          _redbb = (IO_struct) { &DDRB, &PORTB, REDBREADBOARD, &PINB };
           configure_led(&_red);
-          bRedInit = 1;
-          break;
-
-      case(YELLOWBREADBOARD):
-          _red = (IO_struct) { &DDRB, &PORTB, RED, &PINB };
-          configure_led(&_red);
-          bRedInit = 1;
+          bRedInitBreadBoard = 1;
           break;
 
   }
