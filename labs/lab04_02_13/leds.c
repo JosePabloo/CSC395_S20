@@ -5,6 +5,9 @@ static uint8_t bYellowInit = 0;
 static uint8_t bRedInit = 0;
 static uint8_t bGreenInit = 0;
 
+static uint8_t bYellowInitBreadBoard = 0;
+static uint8_t bRedInitBreadBoard  = 0;
+static uint8_t bGreenInitBreadBoard  = 0;
 
 
 /* configure the data direction for the specified on-board led.
@@ -32,6 +35,26 @@ void initialize_led(int color) {
     configure_led(&_red);
     bRedInit = 1;
     break;
+    //BreadBoard Cases:
+
+      case(GREENBREADBOARD):
+          _red = (IO_struct) { &DDRB, &PORTB, RED, &PINB };
+          configure_led(&_red);
+          bRedInit = 1;
+          break;
+
+      case(YELLOWBREADBOARD):
+          _red = (IO_struct) { &DDRB, &PORTB, RED, &PINB };
+          configure_led(&_red);
+          bRedInit = 1;
+          break;
+
+      case(YELLOWBREADBOARD):
+          _red = (IO_struct) { &DDRB, &PORTB, RED, &PINB };
+          configure_led(&_red);
+          bRedInit = 1;
+          break;
+
   }
 }
 

@@ -9,6 +9,12 @@
 #define YELLOW 7
 #define RED 0
 
+#define GREENBREADBOARD 0
+#define YELLOWBREADBOARD 0
+#define REDBREADBOARD 0
+
+
+
 IO_struct _yellow;
 IO_struct _red;
 IO_struct _green;
