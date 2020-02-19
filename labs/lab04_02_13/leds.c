@@ -110,7 +110,7 @@ void external_light_show(){
     int i;
     for (i = 0; i < 2; i++) {
         if (bYellowInitBreadBoard) flash_led(&_yellowbb, 0);
-        if (bRedInitBreadBoard) flash_led(&_redbb, 1); 
+        if (bRedInitBreadBoard) flash_led(&_redbb, 1);
         if (bGreenInitBreadBoard) flash_led(&_greenbb, 1);
     }
 }

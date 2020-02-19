@@ -21,6 +21,7 @@ enum buttonC_states {
 uint8_t yellowTimer = 0;
 uint8_t greenTimer = 0;
 uint32_t mainTimer = 0;
+
 volatile uint8_t button_a_pressed_counter = 0;
 volatile uint8_t button_c_pressed_counter = 0;
 
@@ -34,6 +35,10 @@ void initialize_system(void) {
     // initialization defines the IO_structs and sets DDR
     initialize_led(GREEN);
     initialize_led(YELLOW);
+
+    initialize_led(GREENBREADBOARD);
+    initialize_led(YELLOWBREADBOARD);
+    initialize_led(REDBREADBOARD);
 
     // The "sanity check".
     // When you see this pattern of lights you know the board has reset
