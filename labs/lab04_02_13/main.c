@@ -28,12 +28,28 @@ volatile uint8_t button_c_pressed_counter = 0;
 /***************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
-void set_up_timmer(){
-    //set waveform to ctc = clear_timer_on_compare_match
-//    DDDR |=( 1<< PIN0);
-    //set clock_select_bits to set the prescaler.
+void set_up_timmer() {
+    /**
+     * Set up wavefrom to CTC. (Clear Timer on Compare Match)
+     * CTC = 0100
+     * 01 = TCCR3B
+     * 00 = TCCR3A
+     */
+    TCCR3B |= (1 << WGM32);
+
+    /**
+     * Setting up the Clock_select_bits to set up the prescaler.
+     * Set CS32 bits for 256 prescaler:
+     */
+    TCCR3B |= (1 << CS32);
     //set match to achive 250 ms periods aka 4 hz.
+    OCR3A = 15625;
     //enable the timer interrupt.
+    TIMSK3 |= (1 << OCIE3A);
+}
+
+ISR(TIMER3_COMPA_vect){
+    led_toggle(&_yellowbb);
 }
 
 void initialize_system(void) {
@@ -51,6 +67,8 @@ void initialize_system(void) {
     // When you see this pattern of lights you know the board has reset
     light_show();
     external_light_show();
+
+    set_up_timmer();
     // initalize only buttonA and buttonC because they are connected to PCINT
     // NOTE: button C and the RED led are on the same line.
     initialize_button(&_buttonA);
@@ -170,14 +188,9 @@ int main(void) {
 //    ButtonC_State = C_Starting;
 
 
-//    sei();  //calling this from main.
+    sei();  //calling this from main.
 
-//    DDRD |= (1 << PIN2) | (1 << PIN1) | (1 << PIN4);
-//    PORTD |= (1 << PIN2) | (1 << PIN1) | (1 << PIN4);
-//
-//
-//    PORTD &= ~( 1 << PORTD1 );
-//    PORTD |= ( 1 << PORTD1 );
+
 
 
     while (1) {
