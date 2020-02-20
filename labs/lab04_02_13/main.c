@@ -28,13 +28,20 @@ volatile uint8_t button_c_pressed_counter = 0;
 /***************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
-
+void set_up_timmer(){
+    //set waveform to ctc = clear_timer_on_compare_match
+//    DDDR |=( 1<< PIN0);
+    //set clock_select_bits to set the prescaler.
+    //set match to achive 250 ms periods aka 4 hz.
+    //enable the timer interrupt.
+}
 
 void initialize_system(void) {
     // initalize green and yellow only.
     // initialization defines the IO_structs and sets DDR
     initialize_led(GREEN);
     initialize_led(YELLOW);
+    initialize_led(RED);
 
     initialize_led(GREENBREADBOARD);
     initialize_led(YELLOWBREADBOARD);
@@ -155,40 +162,29 @@ int main(void) {
     //*******         THE CYCLIC CONTROL LOOP            **********//
     //*************************************************************//
 
-    // FILL THIS IN TO MEET FUNCTIONAL REQUIREMENTS:
 
-    // Start with the system with both LED's off.
-    // BUTTON A: modifies only rhe Yellow LED state.
-    // BUTTON C: modifies only the Green LED state.
-
-    // 1st release: LED ON (solidly, no blinking).
-    // 2nd release: LED Blink at frequency provided below
-    // 3rd release: LED OFF
-
-    // When an LED is Blinking:
-    // YELLOW LED - YELLOW LED blink at .4 Hz (ON at 1250 ms, OFF at 2500 ms)
-    // GREEN LED - blink at 2 Hz (ON at 250 ms, OFF at 500 ms, ON at 750 ms, OFF at 1 sec)
-
-    // ONLY USE THE PCINT ISR
-    //Assiming that both buttons are in a not pressed state.
-
-    //Set up the counter and the states for both Buttons
-    //Need to initialize the counter flags for both buttons.
-    //Ned to initalize the states for both LED's
-    button_a_pressed_counter = 0;
-    ButtonA_State = A_Starting;
-
-    button_c_pressed_counter = 0;
-    ButtonC_State = C_Starting;
+//    button_a_pressed_counter = 0;
+//    ButtonA_State = A_Starting;
+//
+//    button_c_pressed_counter = 0;
+//    ButtonC_State = C_Starting;
 
 
-    sei();  //calling this from main.
+//    sei();  //calling this from main.
+
+//    DDRD |= (1 << PIN2) | (1 << PIN1) | (1 << PIN4);
+//    PORTD |= (1 << PIN2) | (1 << PIN1) | (1 << PIN4);
+//
+//
+//    PORTD &= ~( 1 << PORTD1 );
+//    PORTD |= ( 1 << PORTD1 );
+
 
     while (1) {
-        Yellow_LED_Cases();
-        Green_LED_Cases();
-        _delay_ms(250);
-        mainTimer += 250;
+//        Yellow_LED_Cases();
+//        Green_LED_Cases();
+//        _delay_ms(250);
+//        mainTimer += 250;
     } // end while(1)
 
 } /* end main() */
