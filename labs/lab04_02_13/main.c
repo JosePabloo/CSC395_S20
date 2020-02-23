@@ -69,6 +69,7 @@ void set_up_timmer_zero(){
     TIMSK0 |= (1 << OCIE0A);
 
 
+
 }
 
 
