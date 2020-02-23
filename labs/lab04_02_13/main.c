@@ -21,23 +21,90 @@ enum buttonC_states {
 uint8_t yellowTimer = 0;
 uint8_t greenTimer = 0;
 uint32_t mainTimer = 0;
+
 volatile uint8_t button_a_pressed_counter = 0;
 volatile uint8_t button_c_pressed_counter = 0;
+volatile uint32_t ms_ticks = 0;
 
 /***************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
+void set_up_timmer() {
+    /**
+     * Set up wavefrom to CTC. (Clear Timer on Compare Match)
+     * CTC = 0100
+     * 01 = TCCR3B
+     * 00 = TCCR3A
+     */
+    TCCR3B |= (1 << WGM32);
 
+    /**
+     * Setting up the Clock_select_bits to set up the prescaler.
+     * Set CS32 bits for 256 prescaler:
+     */
+    TCCR3B |= (1 << CS32);
+
+    //set match to achive 250 ms periods aka 4 hz.
+    OCR3A = 15625;
+
+    //enable the timer interrupt.
+    TIMSK3 |= (1 << OCIE3A);
+
+}
+
+void set_up_timmer_zero(){
+    /**
+     * Set up wavefrom to CTC. (Clear Timer on Compare Match)
+     * CTC = 010
+     * 01 = TCCR3B
+     */
+    TCCR0A |= (1 << WGM01);
+    /**
+     *  Setting up the Clock_select_bits to set up the prescaler.
+     *  Set CS01 bits for 8 prescaler:
+     */
+    TCCR0A |= (1 << CS01);
+    OCR0A = 62;
+    //enable the timer interrupt.
+    TIMSK0 |= (1 << OCIE0A);
+
+
+}
+
+
+
+
+
+
+
+
+
+ISR(TIMER3_COMPA_vect){
+        led_toggle(&_yellowbb);
+}
+
+ISR(TIMER0_COMPA_vect){
+        ++ms_ticks;
+}
 
 void initialize_system(void) {
     // initalize green and yellow only.
     // initialization defines the IO_structs and sets DDR
     initialize_led(GREEN);
     initialize_led(YELLOW);
+    initialize_led(RED);
+
+    initialize_led(GREENBREADBOARD);
+    initialize_led(YELLOWBREADBOARD);
+    initialize_led(REDBREADBOARD);
 
     // The "sanity check".
     // When you see this pattern of lights you know the board has reset
     light_show();
+    external_light_show();
+
+    set_up_timmer();
+    set_up_timmer_zero();
 
     // initalize only buttonA and buttonC because they are connected to PCINT
     // NOTE: button C and the RED led are on the same line.
@@ -103,7 +170,7 @@ void Green_LED_Cases() {
         //Stating off with the LED off.
         //If the Button A is pressed, Move the Flag counter to the first relase.
         case C_Starting:
-            led_off(&_green,1);
+            led_off(&_green, 1);
             if (1 == button_c_pressed_counter) {
                 ButtonC_State = C_FirstPress;
             }
@@ -150,40 +217,24 @@ int main(void) {
     //*******         THE CYCLIC CONTROL LOOP            **********//
     //*************************************************************//
 
-    // FILL THIS IN TO MEET FUNCTIONAL REQUIREMENTS:
 
-    // Start with the system with both LED's off.
-    // BUTTON A: modifies only rhe Yellow LED state.
-    // BUTTON C: modifies only the Green LED state.
-
-    // 1st release: LED ON (solidly, no blinking).
-    // 2nd release: LED Blink at frequency provided below
-    // 3rd release: LED OFF
-
-    // When an LED is Blinking:
-    // YELLOW LED - YELLOW LED blink at .4 Hz (ON at 1250 ms, OFF at 2500 ms)
-    // GREEN LED - blink at 2 Hz (ON at 250 ms, OFF at 500 ms, ON at 750 ms, OFF at 1 sec)
-
-    // ONLY USE THE PCINT ISR
-    //Assiming that both buttons are in a not pressed state.
-
-    //Set up the counter and the states for both Buttons
-    //Need to initialize the counter flags for both buttons.
-    //Ned to initalize the states for both LED's
-    button_a_pressed_counter = 0;
-    ButtonA_State = A_Starting;
-
-    button_c_pressed_counter = 0;
-    ButtonC_State = C_Starting;
+//    button_a_pressed_counter = 0;
+//    ButtonA_State = A_Starting;
+//
+//    button_c_pressed_counter = 0;
+//    ButtonC_State = C_Starting;
 
 
     sei();  //calling this from main.
 
+
+
+
     while (1) {
-        Yellow_LED_Cases();
-        Green_LED_Cases();
-        _delay_ms(250);
-        mainTimer += 250;
+
+        if (ms_ticks % 500 == 0) {
+            led_toggle(&_greenbb);
+        }
     } // end while(1)
 
 } /* end main() */

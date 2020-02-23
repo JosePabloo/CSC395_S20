@@ -38,20 +38,20 @@ void initialize_led(int color) {
 
     //BreadBoard Cases:
       case (YELLOWBREADBOARD) :
-          _yellowbb = (IO_struct) { &DDRC, &PORTC, YELLOWBREADBOARD, &PINC };
-          configure_led(&_yellow);
+          _yellowbb = (IO_struct) { &DDRD, &PORTD, YELLOWBREADBOARD, &PIND };
+          configure_led(&_yellowbb);
           bYellowInitBreadBoard = 1;
           break;
 
       case(GREENBREADBOARD):
           _greenbb = (IO_struct) { &DDRD, &PORTD, GREENBREADBOARD, &PIND };
-          configure_led(&_green);
+          configure_led(&_greenbb);
           bGreenInitBreadBoard = 1;
           break;
 
       case(REDBREADBOARD):
-          _redbb = (IO_struct) { &DDRB, &PORTB, REDBREADBOARD, &PINB };
-          configure_led(&_red);
+          _redbb = (IO_struct) { &DDRD, &PORTD, REDBREADBOARD, &PIND };
+          configure_led(&_redbb);
           bRedInitBreadBoard = 1;
           break;
 
@@ -104,4 +104,13 @@ void light_show() {
     if (bRedInit) flash_led(&_red, 1);  // inverted (0 turns led on)
     if (bGreenInit) flash_led(&_green, 1);
   }
+}
+
+void external_light_show(){
+    int i;
+    for (i = 0; i < 2; i++) {
+        if (bYellowInitBreadBoard) flash_led(&_yellowbb, 0);
+        if (bRedInitBreadBoard) flash_led(&_redbb, 0);
+        if (bGreenInitBreadBoard) flash_led(&_greenbb, 0);
+    }
 }
