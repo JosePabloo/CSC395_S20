@@ -35,37 +35,49 @@ void set_up_timmer() {
      * CTC = 0100
      * 01 = TCCR3B
      * 00 = TCCR3A
-     *
-     * ********
-     *
-     * Set up wavefrom to CTC. (Clear Timer on Compare Match)
-     * CTC = 010
-     * 01 = TCCR3B
-     *
      */
     TCCR3B |= (1 << WGM32);
-    TCCR0A |= (1 << WGM01);
 
     /**
      * Setting up the Clock_select_bits to set up the prescaler.
      * Set CS32 bits for 256 prescaler:
-     * **************
-     *  Setting up the Clock_select_bits to set up the prescaler.
-     * Set CS01 bits for 8 prescaler:
      */
     TCCR3B |= (1 << CS32);
-    TCCR0A |= (1 << CS01);
-
-
 
     //set match to achive 250 ms periods aka 4 hz.
     OCR3A = 15625;
-    OCR0A = 2000;
 
     //enable the timer interrupt.
     TIMSK3 |= (1 << OCIE3A);
-    TIMSK0 |= (1 << OCIE0A);
+
 }
+
+void set_up_timmer_zero(){
+    /**
+     * Set up wavefrom to CTC. (Clear Timer on Compare Match)
+     * CTC = 010
+     * 01 = TCCR3B
+     */
+    TCCR0A |= (1 << WGM01);
+    /**
+     *  Setting up the Clock_select_bits to set up the prescaler.
+     *  Set CS01 bits for 8 prescaler:
+     */
+    TCCR0A |= (1 << CS01);
+    OCR0A = 62;
+    //enable the timer interrupt.
+    TIMSK0 |= (1 << OCIE0A);
+
+
+}
+
+
+
+
+
+
+
+
 
 ISR(TIMER3_COMPA_vect){
         led_toggle(&_yellowbb);
@@ -92,6 +104,8 @@ void initialize_system(void) {
     external_light_show();
 
     set_up_timmer();
+    set_up_timmer_zero();
+
     // initalize only buttonA and buttonC because they are connected to PCINT
     // NOTE: button C and the RED led are on the same line.
     initialize_button(&_buttonA);
@@ -219,7 +233,7 @@ int main(void) {
     while (1) {
 
         if (ms_ticks % 500 == 0) {
-            led_toggle(&_redbb);
+            led_toggle(&_greenbb);
         }
     } // end while(1)
 
