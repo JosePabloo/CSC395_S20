@@ -17,11 +17,26 @@ typedef  struct {
     void (*tick_fn) (void);
 } task;
 
-
+//using task
 extern task _redTask;
 extern task _yellowTask;
 extern task _buttonATask;
 extern task _buttonCTask;
 extern task _print;
+
+//flags and counters
+
+volatile uint8_t on;
+volatile uint32_t times_pressed;
+volatile uint8_t aImplemented;
+volatile uint8_t cImplemented;
+
+void initialize_task (int taskType);
+
+void red_task();
+void yellow_task();
+void buttonA_task();
+void buttonC_task();
+void print_counter();
 
 #endif
