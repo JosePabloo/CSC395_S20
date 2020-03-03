@@ -57,3 +57,29 @@ void button_A_Task(){
         }
     }
 }
+//checking to see if button C was pressed.
+// if it button was pressed and the led is not turned on/.
+void button_C_Task(){
+    if(button_pressed(&_buttonC)){
+        if(!cImplemented){
+           if(!on){
+               OCR1B += OCR1A / 4;
+               //resting flag
+               if(OCR1B == OCR1A){
+                   on = 1;
+               }
+           }
+           else{
+               OCR1B -= OCR1A / 4;
+               if(OCR1B == 0){
+                   on = 0;
+               }
+           }
+           cImplemented = 1; //yay to the flag/.
+        }
+    }
+}
+
+void print_counter(){
+    printf("button a has been preseed %d times./n", times_pressed);
+}
