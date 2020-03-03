@@ -21,6 +21,10 @@ enum buttonC_states {
 uint8_t yellowTimer = 0;
 uint8_t greenTimer = 0;
 uint32_t mainTimer = 0;
+// this is the flag and brightness
+uint8_t on = 0;
+uint16_t brightness;
+
 
 volatile uint8_t button_a_pressed_counter = 0;
 volatile uint8_t button_c_pressed_counter = 0;
@@ -52,7 +56,7 @@ void set_up_timmer() {
 
 }
 
-void set_up_timmer_zero(){
+void set_up_timmer_zero() {
     /**
      * Set up wavefrom to CTC. (Clear Timer on Compare Match)
      * CTC = 010
@@ -69,16 +73,7 @@ void set_up_timmer_zero(){
     TIMSK0 |= (1 << OCIE0A);
 
 
-
 }
-
-
-
-
-
-
-
-
 
 ISR(TIMER3_COMPA_vect){
         led_toggle(&_yellowbb);
@@ -87,6 +82,7 @@ ISR(TIMER3_COMPA_vect){
 ISR(TIMER0_COMPA_vect){
         ++ms_ticks;
 }
+
 
 void initialize_system(void) {
     // initalize green and yellow only.
@@ -200,12 +196,12 @@ void Green_LED_Cases() {
 
 } // State actions
 
-
-
-/****************************************************************************
-   MAIN
-****************************************************************************/
-
+void timer1_setup() {
+    //WGE to set fast PWM
+    TCCR1A |= (1 << WGM11) | (1 << WGM10) | (1 << COM1B1);
+    TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS12) | (1 << CS10);
+    OCR1A = 0xFFFF;
+}
 
 int main(void) {
     // This prevents the need to reset after flashing
@@ -213,7 +209,8 @@ int main(void) {
 
 
     initialize_system();
-
+    //calling the setup function
+    timer1_setup();
     //*************************************************************//
     //*******         THE CYCLIC CONTROL LOOP            **********//
     //*************************************************************//
@@ -224,18 +221,50 @@ int main(void) {
 //
 //    button_c_pressed_counter = 0;
 //    ButtonC_State = C_Starting;
+// sei();  //calling this from main.
 
-
-    sei();  //calling this from main.
-
-
-
-
+    //setting up the match number
+    OCR1B = 0;
     while (1) {
-
-        if (ms_ticks % 500 == 0) {
-            led_toggle(&_greenbb);
+        //changing the fq. if button c was pressed.
+        if (button_released((&_buttonC))) {
+            if (!on) {
+                //go to 100 then reset flag
+                OCR1B += OCR1A / 4;
+                if (OCR1B == OCR1A) {
+                    on = 1;
+                }
+            } else {
+                //going back to 0 from 100 then reseting flag
+                OCR1B -= OCR1A / 4;
+                if (OCR1B == 0) {
+                    on = 0;
+                }
+            }
         }
-    } // end while(1)
 
-} /* end main() */
+        //changing the fr. if the button A if released.
+        if (button_released((&_buttonA))) {
+            if (!on) {
+                //making it 100
+                for (brightness = 0; brightness < OCR1A; brightness++) {
+                    OCR1B = brightness;
+                    _delay_ms(10);
+                }
+                on = 1;
+            } else {
+                //making it drop down to 0
+                for (brightness = OCR1A; brightness > 0; brightness--) {
+                    OCR1B = brightness;
+                    _delay_ms(10);
+                }
+                on = 0;
+
+            }
+        }
+    } // end while
+
+} //end main
+
+
+
