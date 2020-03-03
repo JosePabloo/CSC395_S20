@@ -33,6 +33,50 @@ volatile uint32_t ms_ticks = 0;
 /***************************************************************************
    ALL INITIALIZATION
 ****************************************************************************/
+void initialize_system(void) {
+
+    initialize_led(GREEN);
+    initialize_led(YELLOW);
+    initialize_led(RED);
+    initialize_led(GREENBREADBOARD);
+    initialize_led(YELLOWBREADBOARD);
+    initialize_led(REDBREADBOARD);
+    initialize_led(REDLABFIVEBREADBOARD);
+    //Initializing Task
+    initialize_task(REDTASK);
+    initialize_task(YELLOWTASK);
+    initialize_task(BUTTONATASK);
+    initialize_task(BUTTONCTASK);
+    initialize_task(PRINTTASK);
+
+    // The "sanity check".
+    // When you see this pattern of lights you know the board has reset
+    light_show();
+    external_light_show();
+
+    set_up_timmer();
+    set_up_timmer_zero();
+
+    // initalize only buttonA and buttonC because they are connected to PCINT
+    // NOTE: button C and the RED led are on the same line.
+    initialize_button(&_buttonA);
+    initialize_button(&_buttonC);
+
+    enable_pcint(&_interruptA);
+    enable_pcint(&_interruptC);
+
+
+    // Setting up the button action. when its pressed or released.
+    // When it's released, called the release funciton.
+    // when released call release function
+
+//    setup_button_action(&_interruptA, 0);
+//    setup_button_action(&_interruptC, 0);
+
+    setup_button_action(&_interruptA, 1, button_a_pressed);
+    setup_button_action(&_interruptC, 1, button_c_pressed);
+}
+
 void set_up_timmer() {
     /**
      * Set up wavefrom to CTC. (Clear Timer on Compare Match)
@@ -62,6 +106,7 @@ void set_up_timmer_zero() {
      * CTC = 010
      * 01 = TCCR3B
      */
+     
     TCCR0A |= (1 << WGM01);
     /**
      *  Setting up the Clock_select_bits to set up the prescaler.
@@ -83,45 +128,6 @@ ISR(TIMER0_COMPA_vect){
         ++ms_ticks;
 }
 
-
-void initialize_system(void) {
-    // initalize green and yellow only.
-    // initialization defines the IO_structs and sets DDR
-    initialize_led(GREEN);
-    initialize_led(YELLOW);
-    initialize_led(RED);
-
-    initialize_led(GREENBREADBOARD);
-    initialize_led(YELLOWBREADBOARD);
-    initialize_led(REDBREADBOARD);
-    initialize_led(REDLABFIVEBREADBOARD);
-    // The "sanity check".
-    // When you see this pattern of lights you know the board has reset
-    light_show();
-    external_light_show();
-
-    set_up_timmer();
-    set_up_timmer_zero();
-
-    // initalize only buttonA and buttonC because they are connected to PCINT
-    // NOTE: button C and the RED led are on the same line.
-    initialize_button(&_buttonA);
-    initialize_button(&_buttonC);
-
-    enable_pcint(&_interruptA);
-    enable_pcint(&_interruptC);
-
-
-    // Setting up the button action. when its pressed or released.
-    // When it's released, called the release funciton.
-    // when released call release function
-
-//    setup_button_action(&_interruptA, 0);
-//    setup_button_action(&_interruptC, 0);
-
-    setup_button_action(&_interruptA, 1, button_a_pressed);
-    setup_button_action(&_interruptC, 1, button_c_pressed);
-}
 
 //This is going to hold the state of the Yellow LED.=
 void Yellow_LED_Cases() {
