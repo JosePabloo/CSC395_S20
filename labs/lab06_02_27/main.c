@@ -5,6 +5,7 @@
 
 #include "leds.h"
 #include "buttons.h"
+#include "task.h"
 
 #define INVERTED 1
 #define ZERO 0
@@ -22,7 +23,7 @@ uint8_t yellowTimer = 0;
 uint8_t greenTimer = 0;
 uint32_t mainTimer = 0;
 // this is the flag and brightness
-uint8_t on = 0;
+//uint8_t on = 0; //already set up can erase;
 uint16_t brightness;
 
 
@@ -47,16 +48,15 @@ void initialize_system(void) {
     initialize_task(YELLOWTASK);
     initialize_task(BUTTONATASK);
     initialize_task(BUTTONCTASK);
-    initialize_task(PRINTTASK);
+    initialize_task(PRINT);
 
     // The "sanity check".
     // When you see this pattern of lights you know the board has reset
     light_show();
     external_light_show();
 
-    set_up_timmer();
     set_up_timmer_zero();
-
+    set_up_timmer_one();
     // initalize only buttonA and buttonC because they are connected to PCINT
     // NOTE: button C and the RED led are on the same line.
     initialize_button(&_buttonA);
@@ -73,8 +73,7 @@ void initialize_system(void) {
 //    setup_button_action(&_interruptA, 0);
 //    setup_button_action(&_interruptC, 0);
 
-    setup_button_action(&_interruptA, 1, button_a_pressed);
-    setup_button_action(&_interruptC, 1, button_c_pressed);
+
 }
 
 
@@ -210,13 +209,6 @@ void Green_LED_Cases() {
 
 } // State actions
 
-void timer1_setup() {
-    //WGE to set fast PWM
-    TCCR1A |= (1 << WGM11) | (1 << WGM10) | (1 << COM1B1);
-    TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS12) | (1 << CS10);
-    OCR1A = 0xFFFF;
-}
-
 int main(void) {
     // This prevents the need to reset after flashing
     USBCON = 0;
@@ -241,14 +233,41 @@ int main(void) {
     //setting up the match number
     OCR1B = 0;
     on = 0;
-    number_of_times_pressed = 0;
+    times_pressed = 0;
     aImplemented = 0;
     cImplemented = 0;
     sei();  //calling this from main.
 
 
     while (1) {
-        //changing the fq. if button c was pressed.
+        if(button_released(&_buttonA)){
+            aImplemented = 0;
+        }
+        if(button_released(&_buttonC)){
+            cImplemented = 0;
+        }
+        //implementing red LED if the ready.
+        if(_redTask.ready){
+            _redTask.tick_fn(); //ticking
+            _redTask.ready = 0; //setting it back
+        }
+        //implementing red LED if the ready.
+        if(_yellowTask.ready){
+            _yellowTask.tick_fn(); //ticking
+            _yellowTask.ready = 0; //setting it back
+        }
+        if(_buttonATask.ready){
+            _buttonATask.tick_fn();
+            _buttonATask.ready = 0;
+        }
+        if(_buttonCTask.ready){
+            _buttonCTask.tick_fn();
+            _buttonCTask.ready = 0;
+        }
+        if(_print.ready){
+            _print.tick_fn();
+            _print.ready = 0;
+        }
 
     } // end while
 

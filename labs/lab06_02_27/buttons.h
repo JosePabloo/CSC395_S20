@@ -52,13 +52,8 @@ void empty_function();
 void initialize_button(IO_struct * button);
 
 //Relasing functions that are keeping track of the number of times that the buttons are pressed.
-void button_a_pressed();
-void button_c_pressed();
-
-void button_a_released();
-void button_c_released();
-
 int button_pressed(IO_struct * button);
+
 int button_released(IO_struct * button);
 
 #endif

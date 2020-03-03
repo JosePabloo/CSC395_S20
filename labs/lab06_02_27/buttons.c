@@ -129,19 +129,4 @@ int button_released(IO_struct * button){
 //        }
 //}
 
-//This is a function that is keeping track of the number of
-//times that the button A and Button Chas been pressed.
-void button_a_pressed(){
-    button_a_pressed_counter = button_a_pressed_counter + 1;
-    if(button_a_pressed_counter == 4){
-        button_a_pressed_counter = 1;
-    }
-}
 
-void button_c_pressed(){
-    button_c_pressed_counter =  button_c_pressed_counter + 1;
-    if(button_c_pressed_counter == 4){
-        button_c_pressed_counter = 1;
-
-    }
-}

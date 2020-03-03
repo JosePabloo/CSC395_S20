@@ -26,11 +26,11 @@ void intialize_task(int taskType){
             break;
         case(BUTTONATASK):
             _buttonATask.period = 500;
-            _buttonATask.tick_fn = button_A_Task;
+            _buttonATask.tick_fn = buttonA_task;
             break;
         case(BUTTONCTASK):
             _buttonCTask.period = 500;
-            _buttonCTask.tick_fn = button_C_Task;
+            _buttonCTask.tick_fn = buttonC_task;
             break;
         case(PRINT):
             _print.period = 500;
@@ -42,11 +42,11 @@ void intialize_task(int taskType){
 }
 //toggle the LED every 500ms
 void red_task(){
-    led_toggle(&_redbb)
+    led_toggle(&_redbb);
 }
 //toggle the LED every 500ms
 void yellow_task(){
-    led_toggle(&_yellowbb)
+    led_toggle(&_yellowbb);
 }
 //task of button A
 void button_A_Task(){
