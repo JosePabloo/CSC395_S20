@@ -77,55 +77,63 @@ void initialize_system(void) {
     setup_button_action(&_interruptC, 1, button_c_pressed);
 }
 
-void set_up_timmer() {
-    /**
-     * Set up wavefrom to CTC. (Clear Timer on Compare Match)
-     * CTC = 0100
-     * 01 = TCCR3B
-     * 00 = TCCR3A
-     */
-    TCCR3B |= (1 << WGM32);
-
-    /**
-     * Setting up the Clock_select_bits to set up the prescaler.
-     * Set CS32 bits for 256 prescaler:
-     */
-    TCCR3B |= (1 << CS32);
-
-    //set match to achive 250 ms periods aka 4 hz.
-    OCR3A = 15625;
-
-    //enable the timer interrupt.
-    TIMSK3 |= (1 << OCIE3A);
-
-}
 
 void set_up_timmer_zero() {
+    cli();
     /**
      * Set up wavefrom to CTC. (Clear Timer on Compare Match)
      * CTC = 010
      * 01 = TCCR3B
      */
-     
+
     TCCR0A |= (1 << WGM01);
     /**
      *  Setting up the Clock_select_bits to set up the prescaler.
-     *  Set CS01 bits for 8 prescaler:
+     *  Set CS01 bits for 64 prescaler:
      */
-    TCCR0A |= (1 << CS01);
-    OCR0A = 62;
+    TCCR0B |= (1 << CS01) | (1 << CS00);
+    TCNT0 = 0; //Timmer initialize
+    OCR0A = 249;
     //enable the timer interrupt.
     TIMSK0 |= (1 << OCIE0A);
 
-
 }
 
-ISR(TIMER3_COMPA_vect){
-        led_toggle(&_yellowbb);
+void set_up_timmer_one() {
+
+    TCCR1A |= (1 << WGM11) | (1 << WGM10) | (1 << COM1B1);
+    TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS12) | (1<<CS10);
+    OCR1A = 0xFFFF;
+
 }
 
 ISR(TIMER0_COMPA_vect){
         ++ms_ticks;
+        //if the task is ready for the red:
+        if(ms_ticks >= _redTask.nextRelease){
+            _redTask.ready = 1;
+            _redTask.nextRelease = ms_ticks + _redTask.period;
+        }
+        //yellow task
+        if(ms_ticks >= _yellowTask.nextRelease){
+            _yellowTask.ready = 1;
+            _yellowTask.nextRelease = ms_ticks + _yellowTask.period;
+        }
+        //button A task
+        if(ms_ticks >= _buttonATask.nextRelease){
+            _buttonATask.ready = 1;
+            _buttonATask.nextRelease = ms_ticks + _buttonATask.period;
+        }
+        //button C task
+        if(ms_ticks >= _buttonCTask.nextRelease){
+            _buttonCTask.ready = 1;
+            _buttonCTask.nextRelease = ms_ticks + _buttonCTask.period;
+        }
+        //print time
+        if(ms_ticks >= _print.nextRelease){
+            _print.ready = 1;
+            _print.nextRelease = ms_ticks + _print.period;
+        }
 }
 
 
@@ -216,7 +224,8 @@ int main(void) {
 
     initialize_system();
     //calling the setup function
-    timer1_setup();
+    set_up_timmer_zero();
+    set_up_timmer_one();
     //*************************************************************//
     //*******         THE CYCLIC CONTROL LOOP            **********//
     //*************************************************************//
@@ -227,47 +236,20 @@ int main(void) {
 //
 //    button_c_pressed_counter = 0;
 //    ButtonC_State = C_Starting;
-// sei();  //calling this from main.
+
 
     //setting up the match number
     OCR1B = 0;
+    on = 0;
+    number_of_times_pressed = 0;
+    aImplemented = 0;
+    cImplemented = 0;
+    sei();  //calling this from main.
+
+
     while (1) {
         //changing the fq. if button c was pressed.
-        if (button_released((&_buttonC))) {
-            if (!on) {
-                //go to 100 then reset flag
-                OCR1B += OCR1A / 4;
-                if (OCR1B == OCR1A) {
-                    on = 1;
-                }
-            } else {
-                //going back to 0 from 100 then reseting flag
-                OCR1B -= OCR1A / 4;
-                if (OCR1B == 0) {
-                    on = 0;
-                }
-            }
-        }
 
-        //changing the fr. if the button A if released.
-        if (button_released((&_buttonA))) {
-            if (!on) {
-                //making it 100
-                for (brightness = 0; brightness < OCR1A; brightness++) {
-                    OCR1B = brightness;
-                    _delay_ms(10);
-                }
-                on = 1;
-            } else {
-                //making it drop down to 0
-                for (brightness = OCR1A; brightness > 0; brightness--) {
-                    OCR1B = brightness;
-                    _delay_ms(10);
-                }
-                on = 0;
-
-            }
-        }
     } // end while
 
 } //end main
