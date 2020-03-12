@@ -56,7 +56,7 @@ void initialize_led(int color) {
           break;
 
       case(REDLABFIVEBREADBOARD):
-          _redbb = (IO_struct) { &DDRD, &PORTD, REDBREADBOARD, &PIND };
+          _redlabfivebb = (IO_struct) { &DDRD, &PORTD, REDLABFIVEBREADBOARD, &PIND };
           configure_led(&_redlabfivebb);
           bRedLabFiveBreadBoard = 1;
           break;
@@ -115,8 +115,8 @@ void light_show() {
 void external_light_show(){
     int i;
     for (i = 0; i < 2; i++) {
-        if (bYellowInitBreadBoard) flash_led(&_yellowbb, 0);
         if (bRedInitBreadBoard) flash_led(&_redbb, 0);
+        if (bYellowInitBreadBoard) flash_led(&_yellowbb, 0);
         if (bGreenInitBreadBoard) flash_led(&_greenbb, 0);
         if (bRedLabFiveBreadBoard) flash_led(&_redlabfivebb, 0);
     }
