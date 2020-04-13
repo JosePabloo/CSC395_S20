@@ -15,10 +15,14 @@ void initialize_heartbeat() {
 
 void heartbeat_with_delay() {
   PORTD ^= (1<<DDD5);
-  _delay_ms(100);
+  _delay_ms(250);
 }
 
-void initialize() {
+int main() {
+
+  // initialize communication
+  char buffer[50];
+  setupUART();
 
   // initialize power supply
   // I use this generally to plug into breadboard to power everything
@@ -26,33 +30,33 @@ void initialize() {
   DDRB |= ( 1 << DDB7 );
   PORTB |= ( 1 << PORTB7 );
 
+  // Status Report of System Bootup
   initialize_heartbeat();
   heartbeat_with_delay();
   heartbeat_with_delay();
   heartbeat_with_delay();
   heartbeat_with_delay();
 
-  setupUART();
+  // initialize ADC for potentiometer
+  uint16_t adc_results;
   adc_init();
-}
 
-int main()
-{
-    initialize();
+  _delay_ms(5000);  // give user 5 seconds to establish communication
 
-    uint16_t adc_results;
-    char buffer[50];
+  printf("All Systems Go\n");
 
-    sei();
+  sei();
 
-    sendString("Here we go!\r\n ");
+  while(1)
+  {
+    adc_results = adc_read(10);
+    sprintf(buffer,"%d\r\n",adc_results);
+    sendString(buffer);
+    heartbeat_with_delay();
 
-    while(1)
-    {
-      adc_results = adc_read();
-      sprintf(buffer,"%d\r\n",adc_results);
-      sendString(buffer);
-
-      heartbeat_with_delay();
-    }
+    adc_results = adc_read(9);
+    sprintf(buffer,"%d\r\n",adc_results);
+    sendString(buffer);
+    heartbeat_with_delay();
+  }
 }
